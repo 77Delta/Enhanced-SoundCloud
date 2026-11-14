@@ -765,12 +765,12 @@ const applySettings = () => {
 const schema = [
     ['lyrics', 'Lyrics'],
 ['video', 'Video'],
-['speed', 'Speed changer'],
-['download', 'Download button on every song'],
 ['blur', 'Video blur', 0, 20, .5, 'px'],
 ['brightness', 'Video brightness', 20, 100, 1, '%'],
-['accent', 'Cover color to accent color'],
-['debloat', 'Remove bloat buttons']
+['speed', 'Speed changer'],
+['download', 'Download button on every song'],
+['debloat', 'Remove bloat buttons'],
+['accent', 'Cover color to accent color']
 ];
 
 const gear = document.createElement('div');
