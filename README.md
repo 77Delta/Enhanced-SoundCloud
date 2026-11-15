@@ -10,7 +10,7 @@
 - A **Download track** button on all tracks that redirects you to the [Cobalt](https://cobalt.meowing.de/) website.
 - A **Debloat** option that deletes all useless elements on screen and unblurs blurred elements.
 - An option to change the website's **accent color** to the track cover's color.
-- **Discord RPC** support (**requires set up**).
+- **Discord RPC** support (**requires additional set up**).
 
 ## Examples:
 https://github.com/user-attachments/assets/3972547d-4aed-4592-96bf-996d0916c972
