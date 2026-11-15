@@ -67,7 +67,7 @@
     html.lyrics-on #lyrics{display:block}
     .lyrics-scroll{position:absolute;inset:0;overflow-y:auto;padding:38% 20px;box-sizing:border-box;scrollbar-width:none;mask-image:linear-gradient(transparent,#000 14%,#000 86%,transparent)}
     .lyrics-scroll::-webkit-scrollbar{display:none}
-    .lyrics-line{color:#fff;font:700 clamp(17px,1.5vw,24px)/1.3 var(--font-main,system-ui,sans-serif);margin:.55em 0;opacity:.28;cursor:pointer;transform-origin:left center;transition:opacity .35s,transform .35s}
+    .lyrics-line{color:#fff;font:700 clamp(17px,1.5vw,24px)/1.3 var(--font-main,system-ui,sans-serif);margin:.55em 0;opacity:.15;cursor:pointer;transform-origin:left center;transition:opacity .35s,transform .35s}
     .lyrics-line:hover{opacity:.7}
     .lyrics-line.near{opacity:.5}
     .lyrics-line.active{opacity:1;transform:scale(1.03)}
@@ -88,7 +88,11 @@
     .esc-reset:hover{background:rgba(255,255,255,.2)}
     .esc-note{margin:6px 0 4px;font-size:11px;line-height:1.4;opacity:.7}
     .esc-note a{color:#fff!important;text-decoration:underline}
-    .lyrics-line.active .lyrics-word{background:linear-gradient(90deg,#fff calc(var(--p,0)*100%),rgba(255,255,255,.4) calc(var(--p,0)*100%));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}`;
+    .lyrics-line.active .lyrics-word{background:linear-gradient(90deg,#fff calc(var(--p,0)*112% - 12%),rgba(255,255,255,.55) calc(var(--p,0)*112%));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+    .lyrics-scroll.words .lyrics-line{opacity:.15}
+    .lyrics-scroll.words .lyrics-line.near{opacity:.25}
+    .lyrics-scroll.words .lyrics-line:hover{opacity:.5}
+    .lyrics-scroll.words .lyrics-line.active{opacity:1;transition:opacity .08s,transform .35s}`;
 
     const addStyle = style => {
         const item = document.createElement('style');
@@ -640,6 +644,7 @@ const renderLyrics = () => {
     const data = current?.lyrics;
     box.textContent = ''; nodes = []; wordNodes = []; activeLine = -2;
     scroll.classList.toggle('plain', data?.synced === false);
+    scroll.classList.toggle('words', !!data?.words);
     if (data) {
         const fragment = document.createDocumentFragment();
         data.lines.forEach((line, index) => {
