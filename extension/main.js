@@ -87,7 +87,8 @@
     .esc-reset{all:unset;display:block;width:100%;box-sizing:border-box;margin:12px 0 6px;padding:6px 0;text-align:center;cursor:pointer;border-radius:4px;background:rgba(255,255,255,.1)}
     .esc-reset:hover{background:rgba(255,255,255,.2)}
     .esc-note{margin:6px 0 4px;font-size:11px;line-height:1.4;opacity:.7}
-    .esc-note a{color:#fff!important;text-decoration:underline}`;
+    .esc-note a{color:#fff!important;text-decoration:underline}
+    .lyrics-line.active .lyrics-word{background:linear-gradient(90deg,#fff calc(var(--p,0)*100%),rgba(255,255,255,.4) calc(var(--p,0)*100%));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}`;
 
     const addStyle = style => {
         const item = document.createElement('style');
@@ -251,7 +252,79 @@ const parsePlain = text => {
     return output;
 };
 
+const yamlScalar = raw => {
+    const text = raw.trim();
+    if (!text) return '';
+    if (text[0] === "'") {
+        let output = '';
+        for (let index = 1; index < text.length; index++) {
+            if (text[index] === "'") {
+                if (text[index + 1] === "'") { output += "'"; index++; continue; }
+                return output;
+            }
+            output += text[index];
+        }
+        return output;
+    }
+    if (text[0] === '"') {
+        for (let index = 1; index < text.length; index++) {
+            if (text[index] === '\\') { index++; continue; }
+            if (text[index] === '"') {
+                try { return JSON.parse(text.slice(0, index + 1)); } catch { return text.slice(1, index); }
+            }
+        }
+        return text.slice(1);
+    }
+    const plain = text.replace(/\s#.*$/, '');
+    return plain === '~' || plain === 'null' ? '' : plain;
+};
+
+const parseLyricsfile = text => {
+    const lines = [];
+    let inLines = false, line = null, word = null, wordsIndent = -1;
+    for (const raw of String(text).split(/\r?\n/)) {
+        const match = raw.match(/^(\s*)(- )?([A-Za-z_]+):(?: (.*))?$/);
+        if (!match) continue;
+        const indent = match[1].length, dash = !!match[2], key = match[3], value = match[4] ?? '';
+        if (!dash && indent === 0) { inLines = key === 'lines'; line = word = null; wordsIndent = -1; continue; }
+        if (!inLines) continue;
+        if (dash && key === 'text') {
+            if (line && wordsIndent >= 0 && indent >= wordsIndent) {
+                word = { text: yamlScalar(value) };
+                (line.words ||= []).push(word);
+            } else {
+                line = { text: yamlScalar(value), fieldIndent: indent + 2 };
+                word = null; wordsIndent = -1;
+                lines.push(line);
+            }
+            continue;
+        }
+        if (!line) continue;
+        if (key === 'words' && !dash) { wordsIndent = value.trim() ? -1 : indent; word = null; continue; }
+        if (key === 'start_ms' || key === 'end_ms') {
+            const number = parseFloat(value);
+            if (!Number.isFinite(number)) continue;
+            const target = word && indent > line.fieldIndent ? word : line;
+            target[key === 'start_ms' ? 'start' : 'end'] = number / 1000;
+        }
+    }
+    const output = lines.filter(item => Number.isFinite(item.start)).map(item => {
+        const words = (item.words || []).filter(entry => Number.isFinite(entry.start)).map((entry, index, all) => ({
+            text: entry.text,
+            start: entry.start,
+            end: Math.max(entry.end ?? all[index + 1]?.start ?? item.end ?? entry.start + .5, entry.start + .05)
+        }));
+        return { time: item.start, text: item.text || words.map(entry => entry.text).join('').trim(), words: words.length ? words : undefined };
+    }).sort((first, second) => first.time - second.time);
+    return output.length ? { synced: true, words: output.some(item => item.words), lines: output } : null;
+};
+
+const hasWords = item => !!item.lyricsfile && (item.hasWordSync === true || /^\s*words:/m.test(item.lyricsfile));
+
 const toLyrics = item => {
+    if (hasWords(item)) {
+        try { const rich = parseLyricsfile(item.lyricsfile); if (rich?.words) return rich; } catch {}
+    }
     const synced = item.syncedLyrics && parseSynced(item.syncedLyrics);
     if (synced?.length) return { synced: true, lines: synced };
     const plain = item.plainLyrics && parsePlain(item.plainLyrics);
@@ -259,7 +332,7 @@ const toLyrics = item => {
 };
 
 const scoreLyrics = (item, context, duration) => {
-    if ((!item.syncedLyrics && !item.plainLyrics) || item.instrumental) return -1;
+    if ((!item.syncedLyrics && !item.plainLyrics && !item.lyricsfile) || item.instrumental) return -1;
     const track = fold(item.trackName), artist = fold(item.artistName), song = context.compact;
     if (!song || !track) return -1;
     let score = 0;
@@ -272,7 +345,7 @@ const scoreLyrics = (item, context, duration) => {
     if (duration && item.duration) {
         const difference = Math.abs(item.duration - duration);
         const penalty = difference <= 5 ? 20 : difference <= 10 ? 10 : difference <= 20 ? -10 : difference <= 40 ? -35 : -100;
-        score += item.syncedLyrics ? penalty : Math.max(penalty, -10);
+        score += (item.syncedLyrics || hasWords(item)) ? penalty : Math.max(penalty, -10);
     }
     return score;
 };
@@ -282,8 +355,8 @@ const pickLyrics = (pool, context, duration) => {
     for (const item of pool.values()) {
         const score = scoreLyrics(item, context, duration);
         if (score < lyricsMinimum) continue;
-        const synced = !!item.syncedLyrics;
-        if (!best || (synced && !best.synced) || (synced === best.synced && score > best.score)) best = { item, score, synced };
+        const rank = hasWords(item) ? 2 : item.syncedLyrics ? 1 : 0;
+        if (!best || rank > best.rank || (rank === best.rank && score > best.score)) best = { item, score, rank };
     }
     return best && toLyrics(best.item);
 };
@@ -527,7 +600,7 @@ const syncVideo = (audio, now, force) => {
     if (Math.abs(youtubeTime - audio.currentTime) > 1.5 && now - lastSeek > 2000) { lastSeek = now; youtubeSend('seekTo', [Math.max(0, audio.currentTime), true]); }
 };
 
-let nodes = [], activeLine = -2, pauseScroll = 0;
+let nodes = [], wordNodes = [], activeLine = -2, pauseScroll = 0;
 
 const findLine = (lines, time) => {
     let low = 0, high = lines.length - 1, result = -1;
@@ -535,31 +608,54 @@ const findLine = (lines, time) => {
     return result;
 };
 
+const paintWords = (index, time) => {
+    const words = wordNodes[index];
+    if (!words) return;
+    for (const word of words) {
+        const progress = time <= word.start ? 0 : time >= word.end ? 1 : (time - word.start) / (word.end - word.start);
+        const value = Math.round(progress * 100) / 100;
+        if (value !== word.value) { word.value = value; word.element.style.setProperty('--p', value); }
+    }
+};
+
 const syncLyrics = time => {
     const index = findLine(current.lyrics.lines, time + .15);
-    if (index === activeLine) return;
-    nodes[activeLine]?.classList.remove('active');
-    nodes[activeLine - 1]?.classList.remove('near');
-    nodes[activeLine + 1]?.classList.remove('near');
-    activeLine = index;
-    nodes[index - 1]?.classList.add('near');
-    nodes[index + 1]?.classList.add('near');
-    const target = nodes[index];
-    if (target) target.classList.add('active');
-    if (Date.now() < pauseScroll) return;
-    scroll.scrollTo({ top: target ? target.offsetTop - scroll.clientHeight * .38 + target.offsetHeight / 2 : 0, behavior: 'smooth' });
+    if (index !== activeLine) {
+        nodes[activeLine]?.classList.remove('active');
+        nodes[activeLine - 1]?.classList.remove('near');
+        nodes[activeLine + 1]?.classList.remove('near');
+        activeLine = index;
+        nodes[index - 1]?.classList.add('near');
+        nodes[index + 1]?.classList.add('near');
+        const target = nodes[index];
+        if (target) target.classList.add('active');
+        if (Date.now() >= pauseScroll) {
+            scroll.scrollTo({ top: target ? target.offsetTop - scroll.clientHeight * .38 + target.offsetHeight / 2 : 0, behavior: 'smooth' });
+        }
+    }
+    paintWords(index, time);
 };
 
 const renderLyrics = () => {
     const data = current?.lyrics;
-    box.textContent = ''; nodes = []; activeLine = -2;
+    box.textContent = ''; nodes = []; wordNodes = []; activeLine = -2;
     scroll.classList.toggle('plain', data?.synced === false);
     if (data) {
         const fragment = document.createDocumentFragment();
         data.lines.forEach((line, index) => {
             const item = document.createElement('div');
             item.className = 'lyrics-line'; item.dataset.index = index;
-            item.textContent = line.text || (data.synced ? '\u266a' : '');
+            if (line.words) {
+                wordNodes[index] = line.words.map(word => {
+                    const element = document.createElement('span');
+                    element.className = 'lyrics-word';
+                    element.textContent = word.text;
+                    item.append(element);
+                    return { element, start: word.start, end: word.end, value: -1 };
+                });
+            } else {
+                item.textContent = line.text || (data.synced ? '\u266a' : '');
+            }
             fragment.append(item); nodes.push(item);
         });
         box.append(fragment);
@@ -818,7 +914,7 @@ reset.onclick = () => {
 panel.append(reset);
 const note = document.createElement('p');
 note.className = 'esc-note';
-note.innerHTML = 'If you want to show the track in your Discord activity follow this <a href="https://github.com/77Delta/Enhanced-SoundCloud#how-to-set-up-discord-rpc" target="_blank" rel="noopener noreferrer">guide</a>.';
+note.innerHTML = 'If you want to show the track in your Discord activity follow this <a href="https://github.com/77Delta/Enhanced-SoundCloud#how-to-set-up-discord-rpc" target="_blank" rel="noopener noreferrer">guide</a>.<br><br>You can support this project by <a href="https://github.com/sponsors/77Delta" target="_blank" rel="noopener noreferrer">donating me</a>.';
 panel.append(note);
 gear.querySelector('button').onclick = () => gear.classList.toggle('open');
 
