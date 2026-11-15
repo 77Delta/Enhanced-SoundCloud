@@ -4,13 +4,13 @@
 
 ## An extension for SoundCloud that adds the following features:
 
-- Spotify-like lyrics.
-- Track's music video as website's background.
-- A playback speed changer with "Preserve pitch" option.
-- A "Download track" button on all tracks that redirects you to the [Cobalt](https://cobalt.meowing.de/) website.
-- A "Debloat" option that deletes all useless elements on screen and unblurs blurred elements.
-- An option to change the website's accent color to the track cover's color.
-- Discord RPC support (**requires set up**).
+- Spotify-like **lyrics**.
+- Track's **music video** as website's background.
+- A **playback speed changer** with **Preserve pitch** option.
+- A **Download track** button on all tracks that redirects you to the [Cobalt](https://cobalt.meowing.de/) website.
+- A **Debloat** option that deletes all useless elements on screen and unblurs blurred elements.
+- An option to change the website's **accent color** to the track cover's color.
+- **Discord RPC** support (**requires set up**).
 
 ## Examples:
 https://github.com/user-attachments/assets/3972547d-4aed-4592-96bf-996d0916c972
@@ -24,7 +24,7 @@ https://github.com/user-attachments/assets/7e010095-ceaa-40bb-998d-7ce89e0b023f
 ## What you need:
 
 - Discord desktop running.
-- Node.js installed.
+- **Node.js** installed.
 
 ## Install:
 
