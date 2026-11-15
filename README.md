@@ -13,9 +13,9 @@
 - **Discord RPC** support (**requires additional set up**).
 
 ## Examples:
-https://github.com/user-attachments/assets/3972547d-4aed-4592-96bf-996d0916c972
+https://github.com/user-attachments/assets/4c1c8ede-b1f2-4807-a226-f4d48095ea62
 
-https://github.com/user-attachments/assets/7e010095-ceaa-40bb-998d-7ce89e0b023f
+https://github.com/user-attachments/assets/d75e4249-f43d-4fd9-83f8-766204f435cc
 
 <img width="290" height="348" alt="Enhanced SoundCloud Example 3" src="https://github.com/user-attachments/assets/e524854e-9d95-49ef-a32f-d735764eb589" />
 
