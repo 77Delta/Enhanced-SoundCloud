@@ -1,3 +1,4 @@
+const api = globalThis.browser ?? chrome;
 const bridge = 'ws://127.0.0.1:8765';
 
 let socket = null, retryAt = 0, owner = null;
@@ -22,7 +23,7 @@ const send = text => {
 
 let latest = 'null';
 
-chrome.runtime.onMessage.addListener((message, sender) => {
+api.runtime.onMessage.addListener((message, sender) => {
     if (message?.type !== 'esc-presence') return;
     const tabID = sender.tab?.id;
     if (message.data === null) {
@@ -34,6 +35,6 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     send(latest);
 });
 
-chrome.tabs.onRemoved.addListener(tabID => {
+api.tabs.onRemoved.addListener(tabID => {
     if (tabID === owner) { owner = null; latest = 'null'; send('null'); }
 });
