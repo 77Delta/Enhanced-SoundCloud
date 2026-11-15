@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    const databaseLink = 'https://raw.githubusercontent.com/77Delta/Enhanced-Soundcloud/main/tracks.json';
+    const databaseLink = 'https://raw.githubusercontent.com/77Delta/Enhanced-SoundCloud/main/tracks.json';
     const lyricsMinimum = 60;
     const videoMinimum = 40;
     const piped = ['https://pipedapi.kavin.rocks', 'https://api.piped.private.coffee', 'https://pipedapi.adminforge.de'];
