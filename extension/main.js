@@ -74,10 +74,10 @@
     .lyrics-scroll.plain{padding-top:10%}
     .lyrics-scroll.plain .lyrics-line{opacity:.9;cursor:default;transform:none;font-weight:600}
     .lyrics-scroll.plain .lyrics-line:empty{height:.6em}
-    #esc-gear{position:fixed;left:10px;bottom:calc(var(--play-controls-height,48px) + 10px);z-index:300;font:13px var(--font-main,system-ui,sans-serif)}
+    #esc-gear{position:fixed;right:30px;bottom:calc(var(--play-controls-height,68px) + 10px);z-index:300;font:13px var(--font-main,system-ui,sans-serif)}
     #esc-gear>button{all:unset;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;background:rgba(0,0,0,.55);backdrop-filter:blur(4px)}
     #esc-gear>button:hover{background:rgba(0,0,0,.8)}
-    .esc-panel{display:none;position:absolute;left:0;bottom:42px;width:270px;padding:8px 14px;color:#fff;background:rgba(15,15,15,.95);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:4px}
+    .esc-panel{display:none;position:absolute;right:0;bottom:42px;width:270px;padding:8px 14px;color:#fff;background:rgba(15,15,15,.95);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:4px}
     #esc-gear.open .esc-panel{display:block}
     .esc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0;cursor:pointer}
     .esc-slide{display:block;margin:10px 0}
