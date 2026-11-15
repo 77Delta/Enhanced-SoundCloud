@@ -85,7 +85,9 @@
     .esc-panel input{accent-color:var(--special-color,#f50);cursor:pointer}
     .esc-slide input{width:100%;margin:0}
     .esc-reset{all:unset;display:block;width:100%;box-sizing:border-box;margin:12px 0 6px;padding:6px 0;text-align:center;cursor:pointer;border-radius:4px;background:rgba(255,255,255,.1)}
-    .esc-reset:hover{background:rgba(255,255,255,.2)}`;
+    .esc-reset:hover{background:rgba(255,255,255,.2)}
+    .esc-note{margin:6px 0 4px;font-size:11px;line-height:1.4;opacity:.7}
+    .esc-note a{color:#fff!important;text-decoration:underline}`;
 
     const addStyle = style => {
         const item = document.createElement('style');
@@ -814,6 +816,10 @@ reset.onclick = () => {
 };
 
 panel.append(reset);
+const note = document.createElement('p');
+note.className = 'esc-note';
+note.innerHTML = 'If you want to show the track in your Discord activity follow this <a href="https://github.com/77Delta/Enhanced-SoundCloud#how-to-set-up-discord-rpc" target="_blank" rel="noopener noreferrer">guide</a>.';
+panel.append(note);
 gear.querySelector('button').onclick = () => gear.classList.toggle('open');
 
 document.addEventListener('click', event => { if (!gear.contains(event.target)) gear.classList.remove('open'); });
