@@ -22,7 +22,7 @@ https://github.com/user-attachments/assets/d75e4249-f43d-4fd9-83f8-766204f435cc
 # Installation:
 
 - For Chrome-based browsers, install the extension from [Chrome Web Store](https://chromewebstore.google.com/detail/enhanced-soundcloud/oheiflpjconebcfilhpbbiimjflknnjj)
-- For Firefox-based browsers, install the extension from [Firefox Addons](https://addons.mozilla.org/es-ES/firefox/addon/enhanced-soundcloud/)
+- For Firefox-based browsers, install the extension from [Firefox Addons](https://addons.mozilla.org/firefox/addon/enhanced-soundcloud/)
 
 # How to set up Discord RPC:
 
