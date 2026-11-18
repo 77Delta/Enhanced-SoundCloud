@@ -19,6 +19,11 @@ https://github.com/user-attachments/assets/d75e4249-f43d-4fd9-83f8-766204f435cc
 
 <img width="290" height="348" alt="Enhanced SoundCloud Example 3" src="https://github.com/user-attachments/assets/e524854e-9d95-49ef-a32f-d735764eb589" />
 
+# Installation:
+
+- For Chrome-based browsers, install the extension from [Chrome Web Store](https://chromewebstore.google.com/detail/enhanced-soundcloud/oheiflpjconebcfilhpbbiimjflknnjj)
+- For Firefox-based browsers, install the extension from [Firefox Addons](https://addons.mozilla.org/es-ES/firefox/addon/enhanced-soundcloud/)
+
 # How to set up Discord RPC:
 
 ## What you need:
@@ -26,7 +31,7 @@ https://github.com/user-attachments/assets/d75e4249-f43d-4fd9-83f8-766204f435cc
 - Discord desktop running.
 - **Node.js** installed.
 
-## Install:
+## Installation:
 
 1. Download and unzip or clone this repository.
 2. Open the **rpc** folder.
@@ -34,7 +39,7 @@ https://github.com/user-attachments/assets/d75e4249-f43d-4fd9-83f8-766204f435cc
    - **macOS or Linux:** open a terminal in the folder and run: `bash install.sh`.
 4. Play a track on SoundCloud it will show on your Discord activity.
 
-## Uninstall:
+## Uninstallation:
 
 1. Open the **rpc** folder.
 2. - **Windows:** execute `uninstall.bat`.
